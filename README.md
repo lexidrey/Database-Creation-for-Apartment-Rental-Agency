@@ -1,1 +1,0 @@
-# Database-Creation-for-Apartment-Rental-Agency
