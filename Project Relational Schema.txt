@@ -1,0 +1,208 @@
+create table amenity
+	(amenity_type varchar(35),
+	cost numeric(5,2),
+	primary key (amenity_type));
+
+create table property
+	(address varchar(50),
+	monthly_parking_charge numeric(5, 2),
+	primary key (address));
+
+create table prop_amen
+	(amenity_type varchar(35),
+	address varchar(50),
+	primary key (amenity_type, address),
+	foreign key (amenity_type) references amenity
+		on delete cascade,
+	foreign key (address) references property
+		on delete cascade);
+
+create table apartment
+	(apt_num numeric(3,0),
+	address varchar(50),
+	monthly_rent numeric(6,2),
+	security_deposit numeric(6,2),
+	size_sq_ft numeric(6,2),
+	num_bedrooms numeric(2,1),
+	num_bathrooms numeric(2,1),
+	primary key (apt_num, address),
+	foreign key (address) references property
+		on delete cascade);
+
+create table apt_amen
+	(amenity_type varchar(35),
+	apt_num numeric(3,0),
+    	address varchar(50),
+	primary key (amenity_type, apt_num, address),
+	foreign key (amenity_type) references amenity
+		on delete cascade,
+    	foreign key (apt_num, address) references apartment
+		on delete cascade);
+
+create table person
+	(full_name varchar(60),
+	phone_number varchar(12),
+	email varchar(50),
+	primary key (full_name));
+	
+create table tenant
+	(full_name varchar(60),
+    	phone_number varchar(12),
+	email varchar(50),
+	bank varchar(40),
+	social_security_number varchar(12),
+	date_of_birth varchar(10),
+	primary key (full_name),
+	foreign key (full_name) references person
+		on delete cascade);
+
+create table prospective_tenant
+	(full_name varchar(60),
+    	phone_number varchar(12),
+	email varchar(50),
+	date_of_visit varchar(10),
+	primary key (full_name),
+	foreign key (full_name) references person
+		on delete cascade);
+
+create table visits
+	(full_name varchar(60),
+	address varchar(50),
+	primary key (full_name, address),
+	foreign key (full_name) references prospective_tenant
+		on delete cascade,
+	foreign key (address) references property
+		on delete cascade);
+
+create table lease
+	(lease_id numeric(10,0),
+	primary key (lease_id));
+
+create table lease_apt
+	(lease_id numeric(10,0),
+	apt_num numeric(3,0),
+    	address varchar(50),
+	primary key (lease_id, apt_num, address),
+	foreign key (lease_id) references lease
+		on delete cascade,
+	foreign key (apt_num, address) references apartment
+		on delete cascade);
+
+create table signs
+	(full_name varchar(60),
+	lease_id numeric(10,0),
+	primary key (full_name, lease_id),
+	foreign key (full_name) references tenant
+		on delete cascade,
+	foreign key (lease_id) references lease
+		on delete cascade);
+
+create table fixed_term_lease
+	(lease_id numeric(10,0),
+	num_months numeric(2,0),
+	primary key (lease_id, num_months),
+	foreign key (lease_id) references lease
+		on delete cascade);
+
+create table month_by_month_lease
+	(lease_id numeric(10,0),
+	notice_period_in_months numeric(2,0),
+	primary key (lease_id, notice_period_in_months),
+	foreign key (lease_id) references lease
+		on delete cascade);
+
+create table spouse_or_roommate
+	(spouse_or_roommate_name varchar(40),
+	primary key (spouse_or_roommate_name));
+
+create table ten_sr
+	(full_name varchar(60),
+	spouse_or_roommate_name varchar(40),
+	primary key (full_name, spouse_or_roommate_name),
+	foreign key (full_name) references tenant
+		on delete cascade,
+	foreign key (spouse_or_roommate_name) references spouse_or_roommate
+		on delete cascade);
+
+create table pet
+	(species varchar(30),
+	pet_name varchar(40),
+	primary key (species, pet_name));
+
+create table ten_pet
+	(full_name varchar(60),
+	species varchar(30),
+	pet_name varchar(40),
+	primary key (full_name, species, pet_name),
+	foreign key (full_name) references tenant
+		on delete cascade,
+	foreign key (species, pet_name) references pet
+		on delete cascade);
+
+create table prior_address
+	(prior_address varchar(120),
+	primary key (prior_address));
+
+create table ten_address
+	(full_name varchar(60),
+	prior_address varchar(120),
+	primary key (full_name, prior_address),
+	foreign key (full_name) references tenant
+		on delete cascade,
+	foreign key (prior_address) references prior_address
+		on delete cascade);
+
+create table rent
+	(rent_id numeric(10,0),
+	due_date varchar(10),
+	cost numeric(6,2),
+	primary key (rent_id));
+
+create table lease_rent
+	(lease_id numeric(10,0),
+	rent_id numeric(10,0),
+	primary key (lease_id, rent_id),
+	foreign key (lease_id) references lease
+		on delete cascade,
+	foreign key (rent_id) references rent
+		on delete cascade);
+
+create table payment
+	(payment_id numeric(10,0),
+	payment_date varchar(10),
+	payment_amount numeric(6,2),
+	primary key (payment_id));
+
+create table pay_rent
+	(payment_id numeric(10,0),
+	rent_id numeric(10,0),
+	primary key (payment_id, rent_id),
+	foreign key (payment_id) references payment
+		on delete cascade,
+	foreign key (rent_id) references rent
+		on delete cascade);
+
+create table charged_service
+	(service_name varchar(50),
+	cost numeric(6,2),
+	primary key (service_name, cost));
+
+create table pay_service
+	(payment_id numeric(10,0),
+	service_name varchar(50),
+	cost numeric(6,2),
+	primary key (payment_id, service_name, cost),
+	foreign key (payment_id) references payment
+		on delete cascade,
+	foreign key (service_name, cost) references charged_service
+		on delete cascade);
+
+create table lease_service
+	(lease_id numeric(10,0),
+	service_name varchar(50),
+	cost numeric(6,2),
+	primary key (lease_id, service_name, cost),
+	foreign key (lease_id) references lease
+		on delete cascade,
+	foreign key (service_name, cost) references charged_service
+		on delete cascade);
