@@ -1,0 +1,1 @@
+Residential Data Management Application (RDMA) for a fictional apartment management company. Designed and implemented a relational Oracle database with Java/JDBC interfaces for managing properties, apartments, tenants, leases, payments, and related services.
